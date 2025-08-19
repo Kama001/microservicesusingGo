@@ -1,0 +1,5 @@
+for verbose output
+curl -v http://localhost:9090 
+
+to send data using curl
+curl -v -d 'hello' http://localhost:9090 
