@@ -10,3 +10,6 @@ curl http://localhost:9090 -XDELETE -v| jq
 to send a put request
 curl -v http://localhost:9090/1 -XPUT
 curl -v http://localhost:9090/1 -d '{"id":1, "name":"tea", "description":"a nice cup of tea"}' -XPUT
+
+to send a post request
+curl -v http://localhost:9090 -d '{"id":1, "name":"tea", "description":"a nice cup of tea"}' -XPOST
