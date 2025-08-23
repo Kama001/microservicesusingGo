@@ -1,0 +1,111 @@
+package data
+
+import (
+	"fmt"
+	"regexp"
+
+	"github.com/go-playground/validator"
+)
+
+// ErrProductNotFound is an error raised when a product can not be found in the database
+var ErrProductNotFound = fmt.Errorf("Product not found")
+
+type Product struct {
+	// the id for the product
+	//
+	// required: false
+	// min: 1
+	ID int `json:"id"` // Unique identifier for the product
+
+	// the name for this poduct
+	//
+	// required: true
+	// max length: 255
+	Name string `json:"name" validate:"required"`
+
+	// the description for this poduct
+	//
+	// required: false
+	// max length: 10000
+	Description string `json:"description"`
+
+	// the price for the product
+	//
+	// required: true
+	// min: 0.01
+	Price float32 `json:"price" validate:"required,gt=0"`
+
+	// the SKU for the product
+	//
+	// required: true
+	// pattern: [a-z]+-[a-z]+-[a-z]+
+	SKU string `json:"sku" validate:"sku"`
+}
+
+// Products defines a slice of Product
+type Products []*Product
+
+// GetProducts returns all products from the database
+func GetProducts() Products {
+	return productList
+}
+
+// AddProduct adds a new product to the database
+func AddProduct(p Product) {
+	// get the next id in sequence
+	maxID := productList[len(productList)-1].ID
+	p.ID = maxID + 1
+	productList = append(productList, &p)
+}
+
+// UpdateProduct replaces a product in the database with the given
+// item.
+// If a product with the given id does not exist in the database
+// this function returns a ProductNotFound error
+func UpdateProduct(p Product, id int) error {
+	i := findIndexByProductID(id)
+	if i == -1 {
+		return ErrProductNotFound
+	}
+	productList[i] = &p
+	return nil
+}
+
+func validateSKU(fl validator.FieldLevel) bool {
+	ptm := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
+	return ptm.MatchString(fl.Field().String())
+}
+
+func (p *Product) ValidateJSON() error {
+	validate := validator.New()
+	validate.RegisterValidation("sku", validateSKU)
+	return validate.Struct(p)
+}
+
+func findIndexByProductID(id int) int {
+	for i, product := range productList {
+		if product.ID == id {
+			return i
+		}
+	}
+	return -1
+}
+
+// productList is a hard coded list of products for this
+// example data source
+var productList = []*Product{
+	&Product{
+		ID:          1,
+		Name:        "Latte",
+		Description: "Frothy milky coffee",
+		Price:       2.45,
+		SKU:         "abc323",
+	},
+	&Product{
+		ID:          2,
+		Name:        "Espresso",
+		Description: "Short and strong coffee without milk",
+		Price:       1.99,
+		SKU:         "fjd34",
+	},
+}
