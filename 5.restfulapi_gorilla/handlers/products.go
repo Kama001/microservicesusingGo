@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,12 +31,7 @@ func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
 
 func (p *Products) AddProducts(rw http.ResponseWriter, r *http.Request) {
 	fmt.Println("Handle POST Product")
-	var prod data.Product
-	err := prod.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, "Unable to UnMarshal", http.StatusBadRequest)
-		return
-	}
+	prod := r.Context().Value(KeyProduct{}).(data.Product)
 	data.AddProduct(&prod)
 }
 
@@ -47,15 +43,26 @@ func (p *Products) UpdateProducts(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("Handle PUT Product")
-	var prod data.Product
-	err = prod.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, "Unable to UnMarshal", http.StatusBadRequest)
-		return
-	}
+	prod := r.Context().Value(KeyProduct{}).(data.Product)
 	err = prod.UpdateProduct(id)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusNotFound)
 		return
 	}
+}
+
+type KeyProduct struct{}
+
+func (p *Products) MiddlewareProductValidation(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		var prod data.Product
+		err := prod.FromJSON(r.Body)
+		if err != nil {
+			http.Error(rw, "Unable to UnMarshal", http.StatusBadRequest)
+			return
+		}
+		ctx := context.WithValue(r.Context(), KeyProduct{}, prod)
+		r = r.WithContext(ctx)
+		next.ServeHTTP(rw, r)
+	})
 }
