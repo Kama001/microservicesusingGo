@@ -71,6 +71,15 @@ func UpdateProduct(p Product, id int) error {
 	return nil
 }
 
+func DeleteProduct(id int) error {
+	i := findIndexByProductID(id)
+	if i == -1 {
+		return ErrProductNotFound
+	}
+	productList = append(productList[:i], productList[i+1:]...)
+	return nil
+}
+
 func validateSKU(fl validator.FieldLevel) bool {
 	ptm := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
 	return ptm.MatchString(fl.Field().String())
