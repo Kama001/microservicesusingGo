@@ -2,9 +2,6 @@ package data
 
 import (
 	"fmt"
-	"regexp"
-
-	"github.com/go-playground/validator"
 )
 
 // ErrProductNotFound is an error raised when a product can not be found in the database
@@ -78,17 +75,6 @@ func DeleteProduct(id int) error {
 	}
 	productList = append(productList[:i], productList[i+1:]...)
 	return nil
-}
-
-func validateSKU(fl validator.FieldLevel) bool {
-	ptm := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
-	return ptm.MatchString(fl.Field().String())
-}
-
-func (p *Product) ValidateJSON() error {
-	validate := validator.New()
-	validate.RegisterValidation("sku", validateSKU)
-	return validate.Struct(p)
 }
 
 func findIndexByProductID(id int) int {
