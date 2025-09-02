@@ -6,3 +6,30 @@ that ensures the generated files are placed relative to the source
 .proto file, which helps with Go's module system.
 
 $ protoc --go-grpc_out=. --go_out=. *.proto
+
+# install grpcurl
+# now you can directly use grpcurl in your terminal
+$ go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+
+# to list all api served
+$ grpcurl --plaintext localhost:9091 list
+o/p: Currency
+
+$ grpcurl --plaintext localhost:9091 list Currency 
+o/p: Currency.GetRate
+
+$ grpcurl --plaintext localhost:9091 describe Currency.GetRate
+o/p: Currency.GetRate is a method:
+rpc GetRate ( .RateRequest ) returns ( .RateResponse );
+
+$ grpcurl --plaintext localhost:9091 describe .RateRequest
+RateRequest is a message:
+message RateRequest {
+  string Base = 1;
+  string Destination = 2;
+}
+
+$ grpcurl --plaintext -d '{"Base":"USD", "Destination":"GBP"}' localhost:9091 Currency.GetRate
+o/p: {
+  "Rate": 0.5
+}
