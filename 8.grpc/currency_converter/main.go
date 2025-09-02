@@ -17,7 +17,7 @@ func main() {
 	protoc.RegisterCurrencyServer(srv, cs)
 	// this will display the api's getting served
 	reflection.Register(srv)
-	l, err := net.Listen("tcp", ":9091")
+	l, err := net.Listen("tcp", ":9092")
 	if err != nil {
 		panic(err)
 	}
