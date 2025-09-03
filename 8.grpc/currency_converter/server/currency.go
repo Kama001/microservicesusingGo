@@ -2,8 +2,9 @@ package server
 
 import (
 	"context"
-	protoc "grpc/protos/currency"
 	"log"
+
+	protoc "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
 )
 
 type Currency struct {

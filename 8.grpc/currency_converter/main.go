@@ -1,10 +1,12 @@
 package main
 
 import (
-	protoc "grpc/protos/currency"
-	server "grpc/server"
 	"log"
 	"net"
+
+	protoc "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
+
+	server "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/server"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

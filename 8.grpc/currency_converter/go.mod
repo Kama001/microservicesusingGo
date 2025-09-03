@@ -1,4 +1,4 @@
-module grpc
+module github.com/Kama001/microservicesusingGo/8.grpc/currency_converter
 
 go 1.24.0
 
