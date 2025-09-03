@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	protos "restapi/protos"
+	protos "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
 
 	"github.com/gorilla/mux"
 )

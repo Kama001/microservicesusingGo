@@ -4,7 +4,8 @@ import (
 	"context"
 	"net/http"
 	"restapi/data"
-	protos "restapi/protos"
+
+	protos "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
 )
 
 // ListAll handles GET requests and returns all current products

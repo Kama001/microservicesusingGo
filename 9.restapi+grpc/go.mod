@@ -3,6 +3,7 @@ module restapi
 go 1.24.0
 
 require (
+	github.com/Kama001/microservicesusingGo/8.grpc/currency_converter v0.0.0-20250903092527-afb06bef6bd1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gorilla/mux v1.8.1
 	google.golang.org/grpc v1.75.0

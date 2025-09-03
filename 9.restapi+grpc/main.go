@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
-	protos "restapi/protos"
+	protos "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
 )
 
 var bindAddress = ":9090"

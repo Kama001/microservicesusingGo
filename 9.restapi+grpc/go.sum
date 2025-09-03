@@ -1,3 +1,5 @@
+github.com/Kama001/microservicesusingGo/8.grpc/currency_converter v0.0.0-20250903092527-afb06bef6bd1 h1:GtzJw8Ot/eiXVDHBO56K99aARdtz5S0KQ4PWF5n8sUs=
+github.com/Kama001/microservicesusingGo/8.grpc/currency_converter v0.0.0-20250903092527-afb06bef6bd1/go.mod h1:w4a6x6g/1F93+Vq8N1PMn4ltigo8grtOaQ4ex/kh8TQ=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
