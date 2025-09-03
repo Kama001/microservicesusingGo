@@ -1,7 +1,11 @@
 package data
 
 import (
+	"context"
 	"fmt"
+
+	protos "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
+	"k8s.io/klog/v2"
 )
 
 // ErrProductNotFound is an error raised when a product can not be found in the database
@@ -42,9 +46,42 @@ type Product struct {
 // Products defines a slice of Product
 type Products []*Product
 
+type ProductsDB struct {
+	currency protos.CurrencyClient
+	log      *klog.Logger
+}
+
+func NewProductsDB(cc protos.CurrencyClient, l *klog.Logger) *ProductsDB {
+	return &ProductsDB{
+		currency: cc,
+		log:      l,
+	}
+}
+
 // GetProducts returns all products from the database
-func GetProducts() Products {
-	return productList
+// with price of products in requested currency
+func (p *ProductsDB) GetProducts(currency string) (Products, error) {
+	if currency == "" {
+		return productList, nil
+	}
+
+	rate, err := p.getRate(currency)
+	if err != nil {
+		p.log.Error(err, fmt.Sprintf("cannot get rate for currency %s", currency))
+		return nil, err
+	}
+	// price converted products list
+	convertedPL := []*Product{}
+	for _, p := range productList {
+		// new product
+		// as p is reference to products
+		// if we modify p
+		// products will be changed
+		np := *p
+		np.Price *= rate
+		convertedPL = append(convertedPL, &np)
+	}
+	return convertedPL, nil
 }
 
 // AddProduct adds a new product to the database
@@ -77,12 +114,22 @@ func DeleteProduct(id int) error {
 	return nil
 }
 
-func GetProductById(id int) (*Product, error) {
+func (p *ProductsDB) GetProductById(id int, currency string) (*Product, error) {
 	i := findIndexByProductID(id)
 	if i == -1 {
 		return nil, ErrProductNotFound
 	}
-	return productList[i], nil
+	if currency == "" {
+		return productList[i], nil
+	}
+	rate, err := p.getRate(currency)
+	if err != nil {
+		p.log.Error(err, fmt.Sprintf("cannot get rate for currency %s", currency))
+		return nil, err
+	}
+	np := *productList[i]
+	np.Price *= rate
+	return &np, nil
 }
 
 func findIndexByProductID(id int) int {
@@ -92,6 +139,17 @@ func findIndexByProductID(id int) int {
 		}
 	}
 	return -1
+}
+
+func (p *ProductsDB) getRate(destination string) (float64, error) {
+	rr := protos.RateRequest{
+		Base:        protos.Currencies(protos.Currencies_value["EUR"]).String(),
+		Destination: protos.Currencies(protos.Currencies_value[destination]).String(),
+	}
+
+	resp, err := p.currency.GetRate(context.Background(), &rr)
+
+	return resp.Rate, err
 }
 
 // productList is a hard coded list of products for this

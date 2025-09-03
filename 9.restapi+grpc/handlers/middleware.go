@@ -12,12 +12,12 @@ func (p *Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 		var prod data.Product
 		err := data.FromJSON(&prod, r.Body)
 		if err != nil {
-			p.l.Println("[ERROR] deserializing product", err)
+			p.log.Error(err, "deserializing product")
 			http.Error(rw, "Unable to UnMarshal", http.StatusBadRequest)
 			return
 		}
 		if err = prod.ValidateJSON(); err != nil {
-			p.l.Println("[ERROR] validating product", err)
+			p.log.Error(err, "validating product")
 			http.Error(rw, err.Error(), http.StatusBadRequest)
 			return
 		}

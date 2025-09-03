@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"restapi/data"
 	"restapi/handlers"
 	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
+	"k8s.io/klog/v2"
 
 	protos "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
 )
@@ -25,18 +26,23 @@ func main() {
 		panic(err)
 	}
 	defer conn.Close()
-
 	// cc = currency client
 	cc := protos.NewCurrencyClient(conn)
 
-	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	hp := handlers.NewProducts(l, cc)
+	l := klog.NewKlogr()
+
+	// create database instance
+	db := data.NewProductsDB(cc, &l)
+
+	hp := handlers.NewProducts(&l, db)
 
 	mu := mux.NewRouter()
 
 	getRouter := mu.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/products", hp.ListAll)
+	getRouter.HandleFunc("/products", hp.ListAll).Queries("currency", "{[A-Z]{3}}")
 	getRouter.HandleFunc("/products/{id:[0-9]+}", hp.ListSingle)
+	getRouter.HandleFunc("/products/{id:[0-9]+}", hp.ListSingle).Queries("currency", "{[A-Z]{3}}")
 
 	putRouter := mu.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/{id:[0-9]+}", hp.Update)
@@ -59,14 +65,14 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		l.Printf("Starting server on %s\n", bindAddress)
+		l.Info("Starting server on ", bindAddress)
 		err := s.ListenAndServe()
 		if err != nil {
-			l.Fatal(err)
+			l.Error(err, "Cannot listen on port %s", bindAddress)
 		}
 	}()
 	<-sigChan
-	l.Println("Received shutdown signal, shutting down server...")
+	l.Info("Received shutdown signal, shutting down server...")
 	tc, cancelFunc := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancelFunc()
 	s.Shutdown(tc)

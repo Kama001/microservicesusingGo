@@ -13,3 +13,5 @@ curl -v http://localhost:9090/1 -d '{"id":1, "name":"tea", "description":"a nice
 
 to send a post request
 curl -v http://localhost:9090 -d '{"id":1, "name":"tea", "description":"a nice cup of tea"}' -XPOST
+
+curl -v "http://localhost:9090/products?currency=USD"

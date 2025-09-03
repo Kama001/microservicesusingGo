@@ -12,11 +12,11 @@ func (p *Products) Update(rw http.ResponseWriter, r *http.Request) {
 
 	id := getProductID(r)
 
-	p.l.Println("[DEBUG] updating record id", id)
+	p.log.Info("updating record id", id)
 	prod.ID = id
 	err := data.UpdateProduct(prod, id)
 	if err == data.ErrProductNotFound {
-		p.l.Println("[ERROR] product not found", err)
+		p.log.Error(err, "[ERROR] product not found")
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: "Product not found in database"}, rw)
 		return

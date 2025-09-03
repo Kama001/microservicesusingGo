@@ -1,22 +1,21 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
+	"restapi/data"
 	"strconv"
 
-	protos "github.com/Kama001/microservicesusingGo/8.grpc/currency_converter/protos/currency"
-
 	"github.com/gorilla/mux"
+	"k8s.io/klog/v2"
 )
 
 type Products struct {
-	l  *log.Logger
-	cc protos.CurrencyClient
+	log *klog.Logger
+	pdb *data.ProductsDB
 }
 
-func NewProducts(l *log.Logger, cc protos.CurrencyClient) *Products {
-	return &Products{l, cc}
+func NewProducts(l *klog.Logger, pdb *data.ProductsDB) *Products {
+	return &Products{l, pdb}
 }
 
 type KeyProduct struct{}
